@@ -1,7 +1,7 @@
 name: Pull
 on:
   schedule:
-    - cron: '0 */3 * * *'
+    - cron: '25 */3 * * *'
 
 jobs:
   build:
@@ -16,6 +16,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git remote add folke https://github.com/folke/neodev.nvim
-          git fetch folke
+          git fetch --unshallow origin
+          git fetch --unshallow folke
           git merge --no-edit folke/main
           git push origin main
