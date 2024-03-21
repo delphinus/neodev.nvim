@@ -52,11 +52,13 @@ function M.on_new_config(config, root_dir)
 
   local opts = require("neodev.config").merge()
 
-  opts.library.enabled = util.is_nvim_config()
+  if type(opts.library.enabled) ~= "function" then
+    opts.library.enabled = util.is_nvim_config()
 
-  if not opts.library.enabled and lua_root then
-    opts.library.enabled = true
-    opts.library.plugins = false
+    if not opts.library.enabled and lua_root then
+      opts.library.enabled = true
+      opts.library.plugins = false
+    end
   end
 
   pcall(function()
@@ -77,7 +79,14 @@ function M.on_new_config(config, root_dir)
       and config.settings.Lua.workspace.ignoreDir
     or {}
 
-  if opts.library.enabled then
+  local enabled
+  if type(opts.library.enabled) == "function" then
+    enabled = opts.library.enabled()
+  else
+    enabled = opts.library.enabled
+  end
+
+  if enabled then
     config.handlers = vim.tbl_extend("force", {}, config.handlers or {})
     config.handlers["workspace/configuration"] = config.handlers["workspace/configuration"]
       or function(err, result, ctx, cfg)
